@@ -2,7 +2,7 @@
 
 A lightweight HTTP client with a colorful CLI interface for API testing - making API calls as simple as child's play!
 
-## Features
+## Featuress
 
 - 🚀 HTTP request execution (GET, POST, PUT, DELETE)
 - 🎨 Beautiful command-line interface with colors
