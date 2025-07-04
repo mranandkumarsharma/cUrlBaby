@@ -17,12 +17,14 @@ A lightweight HTTP client with a colorful CLI interface for API testing - making
 ### Installation
 
 1. Clone this repository:
+
    ```bash
    git clone https://github.com/yourusername/curlbaby.git
    cd curlbaby
    ```
 
 2. Make the script executable:
+
    ```bash
    chmod +x curlbaby.sh
    ```
@@ -59,16 +61,19 @@ A lightweight HTTP client with a colorful CLI interface for API testing - making
 ## Available Commands
 
 ### Basic Commands
+
 - `help` - Display help information
 - `exit` - Exit the application
 
 ### Request Commands
+
 - `get <url>` - Execute a GET request to the specified URL
 - `post <url>` - Execute a POST request with interactive body editor
 - `put <url>` - Execute a PUT request with interactive body editor
 - `delete <url>` - Execute a DELETE request to the specified URL
 
 ### API Group Management Commands
+
 - `group create <name>` - Create a new API group
 - `group list` - List all API groups
 - `group show <id|name>` - Show details of a specific group
@@ -76,6 +81,7 @@ A lightweight HTTP client with a colorful CLI interface for API testing - making
 - `group delete <id>` - Delete a group
 
 ### API Request Management Commands
+
 - `api save <group_id|group_name> <name>` - Save current or new API request to a group
 - `api list <group_id|group_name>` - List all APIs in a group
 - `api show <id>` - Show details of a specific API request
@@ -83,6 +89,7 @@ A lightweight HTTP client with a colorful CLI interface for API testing - making
 - `run <id>` - Execute a saved API request
 
 ### History Commands
+
 - `history` - Display command history
 - `history clear` - Clear command history
 
