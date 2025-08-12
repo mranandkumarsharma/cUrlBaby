@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-//comments
 
 public class ApiCollectionCommands {
 
@@ -38,8 +37,8 @@ public class ApiCollectionCommands {
                 runSavedRequest(argument);
                 break;
             default:
-                uiManager.printError("Unknown API collection command: " + command);
-                uiManager.printInfo("Type 'help' for available commands");
+                uiManager.displayError("Unknown API collection command: " + command);
+                uiManager.displayInfo("Type 'help' for available commands");
         }
     }
 
@@ -70,14 +69,14 @@ public class ApiCollectionCommands {
                 deleteGroup(subArgument);
                 break;
             default:
-                uiManager.printError("Unknown group command: " + subCommand);
+                uiManager.displayError("Unknown group command: " + subCommand);
                 printGroupHelp();
         }
     }
 
     private void handleApiCommand(String argument) {
         if (argument.isEmpty()) {
-            uiManager.printError("Missing API command arguments");
+            uiManager.displayError("Missing API command arguments");
             printApiHelp();
             return;
         }
@@ -100,32 +99,32 @@ public class ApiCollectionCommands {
                 deleteApi(subArgument);
                 break;
             default:
-                uiManager.printError("Unknown API command: " + subCommand);
+                uiManager.displayError("Unknown API command: " + subCommand);
                 printApiHelp();
         }
     }
 
     private void printGroupHelp() {
-        uiManager.printInfo("Group Commands:");
-        uiManager.printInfo("  group create <name> - Create a new API group");
-        uiManager.printInfo("  group list - List all API groups");
-        uiManager.printInfo("  group show <id|name> - Show details of a specific group");
-        uiManager.printInfo("  group rename <id> <new_name> - Rename a group");
-        uiManager.printInfo("  group delete <id> - Delete a group");
+        uiManager.displayInfo("Group Commands:");
+        uiManager.displayInfo("  group create <name> - Create a new API group");
+        uiManager.displayInfo("  group list - List all API groups");
+        uiManager.displayInfo("  group show <id|name> - Show details of a specific group");
+        uiManager.displayInfo("  group rename <id> <new_name> - Rename a group");
+        uiManager.displayInfo("  group delete <id> - Delete a group");
     }
 
     private void printApiHelp() {
-        uiManager.printInfo("API Commands:");
-        uiManager.printInfo("  api save <group_id|group_name> <name> - Save current or new API request to a group");
-        uiManager.printInfo("  api list <group_id|group_name> - List all APIs in a group");
-        uiManager.printInfo("  api show <id> - Show details of a specific API");
-        uiManager.printInfo("  api delete <id> - Delete an API request");
-        uiManager.printInfo("  run <id> - Execute a saved API request");
+        uiManager.displayInfo("API Commands:");
+        uiManager.displayInfo("  api save <group_id|group_name> <name> - Save current or new API request to a group");
+        uiManager.displayInfo("  api list <group_id|group_name> - List all APIs in a group");
+        uiManager.displayInfo("  api show <id> - Show details of a specific API");
+        uiManager.displayInfo("  api delete <id> - Delete an API request");
+        uiManager.displayInfo("  run <id> - Execute a saved API request");
     }
 
     private void createGroup(String argument) {
         if (argument.isEmpty()) {
-            uiManager.printError("Group name is required");
+            uiManager.displayError("Group name is required");
             return;
         }
 
@@ -134,12 +133,12 @@ public class ApiCollectionCommands {
         String description = parts.length > 1 ? parts[1] : "";
 
         if (description.isEmpty()) {
-            uiManager.printInputPrompt("Enter group description (optional):");
+            System.out.print("Enter group description (optional): ");
             description = scanner.nextLine().trim();
         }
 
         if (collectionManager.createGroup(name, description)) {
-            uiManager.printSuccess("Group created: " + name);
+            uiManager.displaySuccess("Group created: " + name);
         }
     }
 
@@ -147,11 +146,11 @@ public class ApiCollectionCommands {
         List<Map<String, Object>> groups = collectionManager.getAllGroups();
 
         if (groups.isEmpty()) {
-            uiManager.printInfo("No API groups found. Create one using 'group create <name>'");
+            uiManager.displayInfo("No API groups found. Create one using 'group create <name>'");
             return;
         }
 
-        uiManager.printInfo("API Groups:");
+        uiManager.displayInfo("API Groups:");
         for (Map<String, Object> group : groups) {
             int id = (int) group.get("id");
             String name = (String) group.get("name");
@@ -166,7 +165,7 @@ public class ApiCollectionCommands {
 
     private void showGroup(String argument) {
         if (argument.isEmpty()) {
-            uiManager.printError("Group ID or name is required");
+            uiManager.displayError("Group ID or name is required");
             return;
         }
 
@@ -177,14 +176,14 @@ public class ApiCollectionCommands {
         } catch (NumberFormatException e) {
             Integer groupId = collectionManager.getGroupIdByName(argument);
             if (groupId == null) {
-                uiManager.printError("Group not found: " + argument);
+                uiManager.displayError("Group not found: " + argument);
                 return;
             }
             group = collectionManager.getGroupById(groupId);
         }
 
         if (group == null) {
-            uiManager.printError("Group not found");
+            uiManager.displayError("Group not found");
             return;
         }
 
@@ -192,7 +191,7 @@ public class ApiCollectionCommands {
         String name = (String) group.get("name");
         String description = (String) group.get("description");
 
-        uiManager.printInfo("Group Details:");
+        uiManager.displayInfo("Group Details:");
         System.out.println("  ID: " + groupId);
         System.out.println("  Name: " + name);
         if (description != null && !description.isEmpty()) {
@@ -202,9 +201,9 @@ public class ApiCollectionCommands {
         // List APIs in this group
         List<Map<String, Object>> requests = collectionManager.getRequestsByGroupId(groupId);
         if (requests.isEmpty()) {
-            uiManager.printInfo("No API requests in this group");
+            uiManager.displayInfo("No API requests in this group");
         } else {
-            uiManager.printInfo("API Requests in this group:");
+            uiManager.displayInfo("API Requests in this group:");
             for (Map<String, Object> request : requests) {
                 System.out.printf("  %d. [%s] %s - %s\n",
                         (int) request.get("id"),
@@ -220,7 +219,7 @@ public class ApiCollectionCommands {
         Matcher matcher = pattern.matcher(argument);
 
         if (!matcher.matches()) {
-            uiManager.printError("Usage: group rename <id> <new_name>");
+            uiManager.displayError("Usage: group rename <id> <new_name>");
             return;
         }
 
@@ -228,36 +227,36 @@ public class ApiCollectionCommands {
         String newName = matcher.group(2);
 
         if (collectionManager.renameGroup(groupId, newName)) {
-            uiManager.printSuccess("Group renamed to: " + newName);
+            uiManager.displaySuccess("Group renamed to: " + newName);
         } else {
-            uiManager.printError("Failed to rename group. Group might not exist.");
+            uiManager.displayError("Failed to rename group. Group might not exist.");
         }
     }
 
     private void deleteGroup(String argument) {
         if (argument.isEmpty()) {
-            uiManager.printError("Group ID is required");
+            uiManager.displayError("Group ID is required");
             return;
         }
 
         try {
             int groupId = Integer.parseInt(argument);
 
-            uiManager.printWarning("This will delete the group and all its API requests.");
-            uiManager.printInputPrompt("Are you sure? (y/n):");
+            System.out.println("⚠️ This will delete the group and all its API requests.");
+            System.out.print("Are you sure? (y/n): ");
             String confirm = scanner.nextLine().trim().toLowerCase();
 
             if (confirm.equals("y") || confirm.equals("yes")) {
                 if (collectionManager.deleteGroup(groupId)) {
-                    uiManager.printSuccess("Group deleted");
+                    uiManager.displaySuccess("Group deleted");
                 } else {
-                    uiManager.printError("Failed to delete group. Group might not exist.");
+                    uiManager.displayError("Failed to delete group. Group might not exist.");
                 }
             } else {
-                uiManager.printInfo("Deletion cancelled");
+                uiManager.displayInfo("Deletion cancelled");
             }
         } catch (NumberFormatException e) {
-            uiManager.printError("Invalid group ID: " + argument);
+            uiManager.displayError("Invalid group ID: " + argument);
         }
     }
 
@@ -266,7 +265,7 @@ public class ApiCollectionCommands {
         Matcher matcher = pattern.matcher(argument);
 
         if (!matcher.matches()) {
-            uiManager.printError("Usage: api save <group_id|group_name> <name>");
+            uiManager.displayError("Usage: api save <group_id|group_name> <name>");
             return;
         }
 
@@ -278,42 +277,41 @@ public class ApiCollectionCommands {
             groupId = Integer.parseInt(groupIdentifier);
 
             if (collectionManager.getGroupById(groupId) == null) {
-                uiManager.printError("Group not found with ID: " + groupId);
+                uiManager.displayError("Group not found with ID: " + groupId);
                 return;
             }
         } catch (NumberFormatException e) {
-
             Integer id = collectionManager.getGroupIdByName(groupIdentifier);
             if (id == null) {
-                uiManager.printError("Group not found: " + groupIdentifier);
+                uiManager.displayError("Group not found: " + groupIdentifier);
                 return;
             }
             groupId = id;
         }
 
-        uiManager.printInputPrompt("HTTP Method (GET, POST, PUT, DELETE):");
+        System.out.print("HTTP Method (GET, POST, PUT, DELETE): ");
         String method = scanner.nextLine().trim().toUpperCase();
         if (!method.matches("GET|POST|PUT|DELETE")) {
-            uiManager.printError("Invalid HTTP method: " + method);
+            uiManager.displayError("Invalid HTTP method: " + method);
             return;
         }
 
-        uiManager.printInputPrompt("URL:");
+        System.out.print("URL: ");
         String url = scanner.nextLine().trim();
         if (url.isEmpty()) {
-            uiManager.printError("URL cannot be empty");
+            uiManager.displayError("URL cannot be empty");
             return;
         }
 
         Map<String, String> headers = new HashMap<>();
         boolean addingHeaders = true;
         while (addingHeaders) {
-            uiManager.printInputPrompt("Add header? (y/n):");
+            System.out.print("Add header? (y/n): ");
             String addHeader = scanner.nextLine().trim().toLowerCase();
             if (addHeader.equals("y")) {
-                uiManager.printInputPrompt("Header name:");
+                System.out.print("Header name: ");
                 String headerName = scanner.nextLine().trim();
-                uiManager.printInputPrompt("Header value:");
+                System.out.print("Header value: ");
                 String headerValue = scanner.nextLine().trim();
                 headers.put(headerName, headerValue);
             } else {
@@ -335,29 +333,29 @@ public class ApiCollectionCommands {
 
         String body = "";
         if (method.equals("POST") || method.equals("PUT")) {
-            uiManager.printInputPrompt("Request body (enter 'json' for JSON editor, or type directly):");
+            System.out.print("Request body (enter 'json' for JSON editor, or type directly): ");
             String bodyInput = scanner.nextLine().trim();
 
             if (bodyInput.equalsIgnoreCase("json")) {
-                SimpleJsonEditor editor = new SimpleJsonEditor(uiManager, scanner, jsonFormatter);
-                body = editor.edit();
+                SimpleJsonEditor editor = new SimpleJsonEditor();
+                body = editor.editJson("{}");
             } else if (!bodyInput.isEmpty()) {
                 body = bodyInput;
             }
         }
 
-        uiManager.printInputPrompt("Description (optional):");
+        System.out.print("Description (optional): ");
         String description = scanner.nextLine().trim();
 
         if (collectionManager.saveRequest(groupId, requestName, method, url,
                 headersJson.toString(), body, description)) {
-            uiManager.printSuccess("API request saved: " + requestName);
+            uiManager.displaySuccess("API request saved: " + requestName);
         }
     }
 
     private void listApis(String argument) {
         if (argument.isEmpty()) {
-            uiManager.printError("Group ID or name is required");
+            uiManager.displayError("Group ID or name is required");
             return;
         }
 
@@ -365,10 +363,9 @@ public class ApiCollectionCommands {
         try {
             groupId = Integer.parseInt(argument);
         } catch (NumberFormatException e) {
-
             Integer id = collectionManager.getGroupIdByName(argument);
             if (id == null) {
-                uiManager.printError("Group not found: " + argument);
+                uiManager.displayError("Group not found: " + argument);
                 return;
             }
             groupId = id;
@@ -376,18 +373,18 @@ public class ApiCollectionCommands {
 
         Map<String, Object> group = collectionManager.getGroupById(groupId);
         if (group == null) {
-            uiManager.printError("Group not found with ID: " + groupId);
+            uiManager.displayError("Group not found with ID: " + groupId);
             return;
         }
 
         List<Map<String, Object>> requests = collectionManager.getRequestsByGroupId(groupId);
 
         if (requests.isEmpty()) {
-            uiManager.printInfo("No API requests in group: " + group.get("name"));
+            uiManager.displayInfo("No API requests in group: " + group.get("name"));
             return;
         }
 
-        uiManager.printInfo("API Requests in " + group.get("name") + ":");
+        uiManager.displayInfo("API Requests in " + group.get("name") + ":");
         for (Map<String, Object> request : requests) {
             System.out.printf("  %d. [%s] %s - %s\n",
                     (int) request.get("id"),
@@ -404,7 +401,7 @@ public class ApiCollectionCommands {
 
     private void showApi(String argument) {
         if (argument.isEmpty()) {
-            uiManager.printError("API request ID is required");
+            uiManager.displayError("API request ID is required");
             return;
         }
 
@@ -413,11 +410,11 @@ public class ApiCollectionCommands {
             Map<String, Object> request = collectionManager.getRequestById(requestId);
 
             if (request == null) {
-                uiManager.printError("API request not found with ID: " + requestId);
+                uiManager.displayError("API request not found with ID: " + requestId);
                 return;
             }
 
-            uiManager.printInfo("API Request Details:");
+            uiManager.displayInfo("API Request Details:");
             System.out.println("  ID: " + request.get("id"));
             System.out.println("  Name: " + request.get("name"));
             System.out.println("  Method: " + request.get("method"));
@@ -453,41 +450,41 @@ public class ApiCollectionCommands {
             }
 
         } catch (NumberFormatException e) {
-            uiManager.printError("Invalid request ID: " + argument);
+            uiManager.displayError("Invalid request ID: " + argument);
         }
     }
 
     private void deleteApi(String argument) {
         if (argument.isEmpty()) {
-            uiManager.printError("API request ID is required");
+            uiManager.displayError("API request ID is required");
             return;
         }
 
         try {
             int requestId = Integer.parseInt(argument);
 
-            uiManager.printWarning("Are you sure you want to delete this API request?");
-            uiManager.printInputPrompt("Confirm (y/n):");
+            System.out.println("⚠️ Are you sure you want to delete this API request?");
+            System.out.print("Confirm (y/n): ");
             String confirm = scanner.nextLine().trim().toLowerCase();
 
             if (confirm.equals("y") || confirm.equals("yes")) {
                 if (collectionManager.deleteRequest(requestId)) {
-                    uiManager.printSuccess("API request deleted");
+                    uiManager.displaySuccess("API request deleted");
                 } else {
-                    uiManager.printError("Failed to delete API request. Request might not exist.");
+                    uiManager.displayError("Failed to delete API request. Request might not exist.");
                 }
             } else {
-                uiManager.printInfo("Deletion cancelled");
+                uiManager.displayInfo("Deletion cancelled");
             }
 
         } catch (NumberFormatException e) {
-            uiManager.printError("Invalid request ID: " + argument);
+            uiManager.displayError("Invalid request ID: " + argument);
         }
     }
 
     private void runSavedRequest(String argument) {
         if (argument.isEmpty()) {
-            uiManager.printError("API request ID is required");
+            uiManager.displayError("API request ID is required");
             return;
         }
 
@@ -496,7 +493,7 @@ public class ApiCollectionCommands {
             Map<String, Object> request = collectionManager.getRequestById(requestId);
 
             if (request == null) {
-                uiManager.printError("API request not found with ID: " + requestId);
+                uiManager.displayError("API request not found with ID: " + requestId);
                 return;
             }
 
@@ -509,11 +506,10 @@ public class ApiCollectionCommands {
 
             if (headersJson != null && !headersJson.equals("{}")) {
                 try {
-
                     headersJson = headersJson.replaceAll("[{}\"]", "");
                     String[] headerPairs = headersJson.split(",");
                     for (String pair : headerPairs) {
-                        String[] keyValue = pair.split(":");
+                        String[] keyValue = pair.split(":", 2);
                         if (keyValue.length == 2) {
                             String key = keyValue[0].trim();
                             String value = keyValue[1].trim();
@@ -521,7 +517,7 @@ public class ApiCollectionCommands {
                         }
                     }
                 } catch (Exception e) {
-                    uiManager.printWarning("Error parsing headers: " + e.getMessage());
+                    System.out.println("⚠️ Error parsing headers: " + e.getMessage());
                 }
             }
 
@@ -529,26 +525,11 @@ public class ApiCollectionCommands {
                 httpRequest.setBody(body);
             }
 
-            uiManager.printInfo("Executing saved request: [" + method + "] " + request.get("name"));
-            switch (method) {
-                case "GET":
-                    requestHandler.executeRequest(httpRequest);
-                    break;
-                case "POST":
-                    requestHandler.executeRequest(httpRequest);
-                    break;
-                case "PUT":
-                    requestHandler.executeRequest(httpRequest);
-                    break;
-                case "DELETE":
-                    requestHandler.executeRequest(httpRequest);
-                    break;
-                default:
-                    uiManager.printError("Unsupported method: " + method);
-            }
+            uiManager.displayInfo("Executing saved request: [" + method + "] " + request.get("name"));
+            requestHandler.executeRequest(httpRequest);
 
         } catch (NumberFormatException e) {
-            uiManager.printError("Invalid request ID: " + argument);
+            uiManager.displayError("Invalid request ID: " + argument);
         }
     }
 }
